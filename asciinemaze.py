@@ -30,19 +30,21 @@ def main(argv):
 
         # Read all lines of the file
         t=0
-        skipdelays = False # Flag to skip delays for the current line
+        skipdelays = False     # flag to skip delays for the current line
+        promptperiod = False   # keep track the part of text that is a shell prompt
 
         for line in open(argv[0]):
             prev=' ' # Rem.: For leading tabulation spaces!
 
             # Check if the line starts with the skipline character
-            if line.startswith(skiplinechar) or line.startswith(skippromptchar):
+            if line.startswith(skiplinechar):
                 skipdelays = True
+            elif line.startswith(skippromptchar):
+                skipdelays = True
+                promptperiod = True
             else:
                 skipdelays = False
-
-            # keep a flag for the first $ or # character occurance, per line
-            promptcharoccurance = False
+                promptperiod = False
 
             # And add one line for each character
             for c in line:
@@ -80,15 +82,15 @@ def main(argv):
                     elif (c == skippromptchar):
                         # it is the beginning of a prompt, setting color on
                         sys.stdout.write('\\u001b[1;32m')
-                    elif (((c == '$') or (c == '#')) and (promptcharoccurance == False)):
+                    elif (((c == '$') or (c == '#')) and (promptperiod == True)):
                         # it is the end of a prompt, setting color off
                         sys.stdout.write('\\u001b[0m'+c)
                         # we skip delays in the space character that follows
-                    elif (((prev == '$') or (prev == '#')) and (c == ' ') and (skipdelays == True) and (promptcharoccurance == False)):
+                    elif ((prev == '$') or (prev == '#')) and (c == ' ') and (promptperiod == True):
                         # print space character
                         sys.stdout.write (' ')
                         skipdelays = False
-                        promptcharoccurance = True
+                        promptperiod = False
                     else:
                         sys.stdout.write(str(c))
                 print('"]')

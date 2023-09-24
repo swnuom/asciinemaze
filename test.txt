@@ -1,0 +1,9 @@
+±user@boss:~$ # Καλωσήρθατε στα μάθημα των συστημάτων υπολογιστών
+±user@boss:~$ # 
+±user@boss:~$ # θα συζητήσουμε για την γραμμή εντολών, δοκιμάζοντας
+±user@boss:~$ # την εντολή ls
+±user@boss:~$ ls
+§LICENSE  README.md  asciicastit.sh  asciinemaze.py
+±user@boss:~$ # παρατηρούμε το αποτέλεσμα
+±user@boss:~$ clear
+\\u001b[{2}J
