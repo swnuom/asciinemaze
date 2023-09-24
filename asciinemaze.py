@@ -6,6 +6,13 @@ lospeed = 0.03
 hispeed = 0.3
 thinkscaler = 3
 tabtime = 0.0001
+skiplinechar = "§"  # skip delays for whole line, i.e., for command output
+skippromptchar = "±"  # skip delays upto $ character, i.e., for linux prompt
+
+def escape_ansi(text):
+    # This function takes a text with ANSI escape codes and encodes them for storage
+    return text.encode('unicode_escape').decode('utf-8')
+
 
 def main(argv):
     if (len(argv) < 1):
@@ -23,8 +30,20 @@ def main(argv):
 
         # Read all lines of the file
         t=0
+        skipdelays = False # Flag to skip delays for the current line
+
         for line in open(argv[0]):
             prev=' ' # Rem.: For leading tabulation spaces!
+
+            # Check if the line starts with the skipline character
+            if line.startswith(skiplinechar) or line.startswith(skippromptchar):
+                skipdelays = True
+            else:
+                skipdelays = False
+
+            # keep a flag for the first $ or # character occurance, per line
+            promptcharoccurance = False
+
             # And add one line for each character
             for c in line:
                 sys.stdout.write('[')
@@ -33,11 +52,14 @@ def main(argv):
                     # That means we must skip tabulation spaces and also
                     # we should wait a bit after end of words (thinking time)
                     if ((prev == '\t') or (prev == ' ')): # \n missing here for a cause!
-                        t = t + tabtime # fast tabulation!
+                        if not skipdelays:
+                            t = t + tabtime # fast tabulation!
                     else:
-                        t = t + random.uniform(lospeed*thinkscaler, hispeed*thinkscaler) # thinking time
+                        if not skipdelays:
+                            t = t + random.uniform(lospeed*thinkscaler, hispeed*thinkscaler) # thinking time
                 else:
-                    t = t + random.uniform(lospeed, hispeed) # usual writin' time
+                    if not skipdelays:
+                        t = t + random.uniform(lospeed, hispeed) # usual writin' time
 
                 sys.stdout.write(str(t))
                 sys.stdout.write(', "o", "')
@@ -51,7 +73,24 @@ def main(argv):
                 elif (c == '\\'):
                     sys.stdout.write('\\\\')
                 else:
-                    sys.stdout.write(str(c))
+                    if (c == skiplinechar):
+                        # do not print skipline character
+                        sys.stdout.write('')
+                        #sys.stdout.write("\u001b[?2004l\r")
+                    elif (c == skippromptchar):
+                        # it is the beginning of a prompt, setting color on
+                        sys.stdout.write('\\u001b[1;32m')
+                    elif (((c == '$') or (c == '#')) and (promptcharoccurance == False)):
+                        # it is the end of a prompt, setting color off
+                        sys.stdout.write('\\u001b[0m'+c)
+                        # we skip delays in the space character that follows
+                    elif (((prev == '$') or (prev == '#')) and (c == ' ') and (skipdelays == True) and (promptcharoccurance == False)):
+                        # print space character
+                        sys.stdout.write (' ')
+                        skipdelays = False
+                        promptcharoccurance = True
+                    else:
+                        sys.stdout.write(str(c))
                 print('"]')
                 prev = c # update prev char
 
