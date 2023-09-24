@@ -6,8 +6,11 @@ lospeed = 0.03
 hispeed = 0.3
 thinkscaler = 3
 tabtime = 0.0001
-skiplinechar = "§"  # skip delays for whole line, i.e., for command output
-skippromptchar = "±"  # skip delays upto $ character, i.e., for linux prompt
+skiplinechar = '§'  # skip delays for whole line, i.e., for command output
+skippromptchar = '±'  # skip delays upto $ character, i.e., for linux prompt
+clschar = '&'
+clsansi = '\\u001b[2J' # clear screen ansi
+cursorhomeansi = '\\u001b[H' # move cursor to home ansi
 
 def escape_ansi(text):
     # This function takes a text with ANSI escape codes and encodes them for storage
@@ -37,7 +40,7 @@ def main(argv):
             prev=' ' # Rem.: For leading tabulation spaces!
 
             # Check if the line starts with the skipline character
-            if line.startswith(skiplinechar):
+            if line.startswith(skiplinechar) or line.startswith(clschar):
                 skipdelays = True
             elif line.startswith(skippromptchar):
                 skipdelays = True
@@ -91,6 +94,8 @@ def main(argv):
                         sys.stdout.write (' ')
                         skipdelays = False
                         promptperiod = False
+                    elif (c == clschar):
+                        sys.stdout.write (clsansi+cursorhomeansi)
                     else:
                         sys.stdout.write(str(c))
                 print('"]')
