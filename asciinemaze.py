@@ -8,9 +8,11 @@ thinkscaler = 3
 tabtime = 0.0001
 skiplinechar = '§'  # skip delays for whole line, i.e., for command output
 skippromptchar = '±'  # skip delays upto $ character, i.e., for linux prompt
-clschar = '&'
+clschar = '&' # clear screen character
+delaychar = '~' # wait 2 seconds
 clsansi = '\\u001b[2J' # clear screen ansi
 cursorhomeansi = '\\u001b[H' # move cursor to home ansi
+skipprintingchar = False
 
 def escape_ansi(text):
     # This function takes a text with ANSI escape codes and encodes them for storage
@@ -35,19 +37,27 @@ def main(argv):
         t=0
         skipdelays = False     # flag to skip delays for the current line
         promptperiod = False   # keep track the part of text that is a shell prompt
-
         for line in open(argv[0]):
             prev=' ' # Rem.: For leading tabulation spaces!
+
+            skipprintingchar = False
 
             # Check if the line starts with the skipline character
             if line.startswith(skiplinechar) or line.startswith(clschar):
                 skipdelays = True
+                skipprintingchar = True
             elif line.startswith(skippromptchar):
                 skipdelays = True
                 promptperiod = True
+                # printing of skippromptchar is already skipped
             else:
                 skipdelays = False
                 promptperiod = False
+
+            # If line starts with delay char, set 2 seconds wait time
+            if line.startswith(delaychar):
+                t=t+2
+                skipprintingchar = True
 
             # And add one line for each character
             for c in line:
@@ -72,19 +82,15 @@ def main(argv):
                     sys.stdout.write('\\t')
                 elif (c == '\n'):
                     # Rem.: Endl is used by the file format this way!!!
-                    # skip end of line, in the case of clear
-                    if (prev != clschar):
+                    # skip end of line, in the case of clear or delay chars
+                    if (prev != clschar) and (prev != delaychar):
                         sys.stdout.write('\\r\\n')
                 elif (c == '"'):
                     sys.stdout.write('\\"')
                 elif (c == '\\'):
                     sys.stdout.write('\\\\')
                 else:
-                    if (c == skiplinechar):
-                        # do not print skipline character
-                        sys.stdout.write('')
-                        #sys.stdout.write("\u001b[?2004l\r")
-                    elif (c == skippromptchar):
+                    if (c == skippromptchar):
                         # it is the beginning of a prompt, setting color on
                         sys.stdout.write('\\u001b[1;32m')
                     elif (((c == '$') or (c == '#')) and (promptperiod == True)):
@@ -98,7 +104,13 @@ def main(argv):
                         promptperiod = False
                     elif (c == clschar):
                         sys.stdout.write (clsansi+cursorhomeansi)
+                    elif skipprintingchar:
+                        # do not print control characters
+                        sys.stdout.write ('')
+                        # enable printing characters that follow
+                        skipprintingchar = False
                     else:
+                        # printable character
                         sys.stdout.write(str(c))
                 print('"]')
                 prev = c # update prev char
