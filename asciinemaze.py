@@ -72,7 +72,9 @@ def main(argv):
                     sys.stdout.write('\\t')
                 elif (c == '\n'):
                     # Rem.: Endl is used by the file format this way!!!
-                    sys.stdout.write('\\r\\n')
+                    # skip end of line, in the case of clear
+                    if (prev != clschar):
+                        sys.stdout.write('\\r\\n')
                 elif (c == '"'):
                     sys.stdout.write('\\"')
                 elif (c == '\\'):
