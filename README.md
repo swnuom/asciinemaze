@@ -16,7 +16,7 @@ sed -i '/^±/!s/^/§/' input.txt
 This command adds the special character § in all lines that do not start with ± (display at once all non prompt lines). 
 
 ```console
-sed -i '/\$/s/^/±/' lab5-1.txt
+sed -i '/\$/s/^/±/' input.txt
 ```
 This command adds the special character ± at the beginning of all lines that contain character $ (there is a prompt).
 
