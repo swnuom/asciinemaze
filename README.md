@@ -22,4 +22,5 @@ This command adds the special character ± at the beginning of all lines that co
 
 # Demo
 
-https://asciinema.org/a/fsWVAwsMAo64ev9RMdgZNiMpl
+[https://asciinema.org/a/fsWVAwsMAo64ev9RMdgZNiMpl
+](https://github.com/swnuom/asciinemaze)
