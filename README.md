@@ -10,10 +10,11 @@ The input file can use the following special characters:
 
 # useful commands
 
+The following command adds the special character `§` in all lines that do not start with `±` (display at once all non prompt lines).
+
 ```console
 sed -i '/^±/!s/^/§/' input.txt
 ```
-This command adds the special character § in all lines that do not start with ± (display at once all non prompt lines). 
 
 You can also do it for lines that do not have on character only (i.e., skip "clear screen" or "wait a few second" characters).
 
@@ -21,11 +22,11 @@ You can also do it for lines that do not have on character only (i.e., skip "cle
 sed -i '/^±/!s/^.\\{2,\\}/§/' input.txt
 ```
 
+The following command adds the special character `±` at the beginning of all lines that contain character `$` (there is a prompt).
+
 ```console
 sed -i '/\$/s/^/±/' input.txt
 ```
-
-This command adds the special character ± at the beginning of all lines that contain character $ (there is a prompt).
 
 We can also skip single character lines:
 
