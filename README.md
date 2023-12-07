@@ -28,12 +28,6 @@ The following command adds the special character `±` at the beginning of all li
 sed -i '/\$/s/^/±/' input.txt
 ```
 
-We can also skip single character lines:
-
-```console
-sed -i '/\$/s/^.\\{2,\\}/±/' input.txt
-```
-
 # Demo
 
 [![asciicast](https://asciinema.org/a/YAO5k8H8GBiTFNIdG0oIb6izV.svg)](https://asciinema.org/a/YAO5k8H8GBiTFNIdG0oIb6izV)
